@@ -1,0 +1,19 @@
+{
+    "name": "ObfuzResolver.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:61c6fe82ddd147745847b7d8cd446bf8",
+        "GUID:66e09fc524ec6594b8d6ca1d91aa1a41"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

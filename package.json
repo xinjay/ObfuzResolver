@@ -1,0 +1,19 @@
+{
+  "name": "com.xinjay.obfuzresolver",
+  "version": "1.0.0",
+  "displayName": "ObfuzResolver",
+  "description": "ObfuzResolver is a tool for Obfuz, which enables developers to quickly debug programs that have been strengthened and obfuscated using Obfuz.",
+  "category": "Scripting",
+  "license": "MIT",
+  "keywords": [
+    "Obfuz",
+    "ObfuzResolver",
+	"Obfuscator",
+	"DeObfuz"
+  ],
+  "author": {
+    "name": "xinjay",
+    "email": "xinjay@outlook.com",
+    "url": "https://github.com/xinjay"
+  }
+}
