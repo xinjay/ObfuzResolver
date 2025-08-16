@@ -12,7 +12,7 @@ namespace ObfuzResolver.Editor
         DeObfuz
     }
 
-    public class ObfuzResolveWindow : EditorWindow
+    public class ObfuzResolveUtility : EditorWindow
     {
         private ObfuzResolveSettings settings;
         private string inputText = "";
@@ -20,10 +20,9 @@ namespace ObfuzResolver.Editor
         private ObfuzResolveManager obfuzDebugManager;
         private DefuzLogMode logType;
 
-        [MenuItem("ObfuzResolve/ObfuzResolver")]
         public static void ShowWindow()
         {
-            GetWindow<ObfuzResolveWindow>("ObfuzResolver");
+            GetWindow<ObfuzResolveUtility>("ObfuzResolveUtility");
         }
 
         private void OnEnable()
@@ -34,9 +33,46 @@ namespace ObfuzResolver.Editor
 
         private void OnGUI()
         {
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.BeginVertical();
+
+
+            //EditorGUILayout.Space();
+            //GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(2));
             EditorGUI.BeginChangeCheck();
-            settings.HookUnityDebug =
-                EditorGUILayout.Toggle("HookUnityDebug", settings.HookUnityDebug, GUILayout.Width(200));
+            logType = (DefuzLogMode)GUILayout.Toolbar((int)logType,
+                new[] { new GUIContent("Original"), new GUIContent("Resolved"), }, "LargeButton",
+                GUI.ToolbarButtonSize.Fixed, GUILayout.ExpandWidth(true));
+            if (EditorGUI.EndChangeCheck())
+                SelectLogMode(logType);
+            // 详情面板也支持富文本
+            GUIStyle richTextStyle = new GUIStyle(EditorStyles.textArea)
+            {
+                richText = true, // 启用富文本
+                wordWrap = true,
+                alignment = TextAnchor.UpperLeft
+            };
+            switch (logType)
+            {
+                case DefuzLogMode.Original:
+                    inputText = EditorGUILayout.TextArea(inputText, richTextStyle, GUILayout.MinHeight(100),
+                        GUILayout.ExpandHeight(true));
+                    break;
+                case DefuzLogMode.DeObfuz:
+                    EditorGUILayout.TextArea(outputText, richTextStyle, GUILayout.MinHeight(100),
+                        GUILayout.ExpandHeight(true));
+                    break;
+            }
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.BeginVertical(GUILayout.Width(150));
+            EditorGUI.BeginChangeCheck();
+            settings.HookUnityLog =
+                EditorGUILayout.Toggle("HookUnityLog", settings.HookUnityLog);
             if (EditorGUI.EndChangeCheck())
             {
                 HookUnityDebugIfNeeded();
@@ -45,23 +81,20 @@ namespace ObfuzResolver.Editor
 
             EditorGUI.BeginChangeCheck();
             settings.RemoveMethodGeneratedByObfuz =
-                EditorGUILayout.Toggle("RemoveObfuzGenMethod", settings.RemoveMethodGeneratedByObfuz,
-                    GUILayout.Width(200));
+                EditorGUILayout.Toggle("RemoveObfuzGenMethod", settings.RemoveMethodGeneratedByObfuz);
             if (EditorGUI.EndChangeCheck())
             {
                 ObfuzResolveManager.Instance.SetObfuzGenMethodState(settings.RemoveMethodGeneratedByObfuz);
                 ObfuzResolveSettings.Save();
             }
 
-            EditorGUILayout.BeginHorizontal();
+            GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(2));
             EditorGUI.BeginChangeCheck();
             settings.UseExternalMappingFile = EditorGUILayout.Toggle("ExternalMappingFile",
-                settings.UseExternalMappingFile,
-                GUILayout.Width(200));
+                settings.UseExternalMappingFile);
             if (settings.UseExternalMappingFile)
             {
-                settings.ExternalMappingFile = EditorGUILayout.TextField(settings.ExternalMappingFile);
-                if (GUILayout.Button("Browse", GUILayout.Width(80)))
+                if (GUILayout.Button("Browse"))
                 {
                     var file = EditorUtility.OpenFilePanel("Select external mapping File", "", "xml");
                     if (!string.IsNullOrEmpty(file))
@@ -69,6 +102,8 @@ namespace ObfuzResolver.Editor
                         settings.ExternalMappingFile = file;
                     }
                 }
+
+                settings.ExternalMappingFile = EditorGUILayout.TextField(settings.ExternalMappingFile);
             }
 
             if (EditorGUI.EndChangeCheck())
@@ -77,29 +112,11 @@ namespace ObfuzResolver.Editor
                 ObfuzResolveSettings.Save();
             }
 
-            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space(20);
+            GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(2));
             if (GUILayout.Button("Resolve LogFile"))
                 ResolveLogFile();
-
-
-            EditorGUILayout.Space();
-            GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(2));
-            EditorGUI.BeginChangeCheck();
-            logType = (DefuzLogMode)GUILayout.Toolbar((int)logType,
-                new[] { new GUIContent("Original"), new GUIContent("Resolved"), }, "LargeButton",
-                GUI.ToolbarButtonSize.Fixed, GUILayout.ExpandWidth(true));
-            if (EditorGUI.EndChangeCheck())
-                SelectLogMode(logType);
-            switch (logType)
-            {
-                case DefuzLogMode.Original:
-                    inputText = EditorGUILayout.TextArea(inputText, GUILayout.MinHeight(100),
-                        GUILayout.ExpandHeight(true));
-                    break;
-                case DefuzLogMode.DeObfuz:
-                    EditorGUILayout.TextArea(outputText, GUILayout.MinHeight(100), GUILayout.ExpandHeight(true));
-                    break;
-            }
+            EditorGUILayout.EndHorizontal();
         }
 
 
@@ -160,11 +177,11 @@ namespace ObfuzResolver.Editor
 
         public static void HookUnityDebugIfNeeded()
         {
-            if (ObfuzResolveSettings.Instance.HookUnityDebug)
-                ObfuzResolveManager.Instance.HookUnityDebug();
+            if (ObfuzResolveSettings.Instance.HookUnityLog)
+                ObfuzResolveManager.Instance.HookUnityLog();
             else
-                ObfuzResolveManager.Instance.UnHookUnityDebug();
-            Debug.Log($"Unity Debug Hooked:{ObfuzResolveSettings.Instance.HookUnityDebug}");
+                ObfuzResolveManager.Instance.UnHookUnityLog();
+            //Debug.Log($"Unity Log Hooked:{ObfuzResolveSettings.Instance.HookUnityLog}");
         }
     }
 }

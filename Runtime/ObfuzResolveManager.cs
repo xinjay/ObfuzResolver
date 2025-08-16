@@ -8,7 +8,6 @@ namespace ObfuzResolver.Runtime
     public class ObfuzResolveManager
     {
         private SymbolMappingReader reader;
-        private ObfuzDebugHandler _obfuzDebugHandler = new();
         private ILogHandler defaultHandler;
         private static ObfuzResolveManager _instance;
         private StringBuilder stringBuilder = new();
@@ -31,14 +30,27 @@ namespace ObfuzResolver.Runtime
             if (File.Exists(mappingFile))
             {
                 Instance.LoadMapFile(mappingFile);
-                Instance.HookUnityDebug();
+                Instance.HookUnityLog();
+                ObfuzResolveRuntimeConsole.Instance.SetConsoleState(true);
+            }
+        }
+
+        public void LoadDefaultMappingFile()
+        {
+            var mappingFile = Path.Combine(Application.persistentDataPath, "mapping.xml");
+            if (File.Exists(mappingFile))
+            {
+                LoadMapFile(mappingFile);
+            }
+            else
+            {
+                Debug.LogWarning($"mappingFile:{mappingFile} is not exist!");
             }
         }
 
         public void LoadMapFile(string mappingFile)
         {
             reader = new SymbolMappingReader(mappingFile);
-            _obfuzDebugHandler.SetMappingReader(reader);
         }
 
         public void SetObfuzGenMethodState(bool remove)
@@ -46,24 +58,21 @@ namespace ObfuzResolver.Runtime
             removeMethodGeneratedByObfuz = remove;
         }
 
-        public void HookUnityDebug()
+        public void HookUnityLog()
         {
-            var handler = Debug.unityLogger.logHandler;
-            if (handler is not ObfuzDebugHandler)
-            {
-                defaultHandler = handler;
-                _obfuzDebugHandler.SetInternalHandler(defaultHandler);
-                Debug.unityLogger.logHandler = _obfuzDebugHandler;
-            }
+            UnityLogHook.HookUnityLog();
+            Debug.LogWarning($"Unity Log is Hooked!");
         }
 
-        public void UnHookUnityDebug()
+        public void UnHookUnityLog()
         {
-            var handler = Debug.unityLogger.logHandler;
-            if (handler is ObfuzDebugHandler)
-            {
-                Debug.unityLogger.logHandler = defaultHandler;
-            }
+            UnityLogHook.UnHookUnityLog();
+            Debug.LogWarning($"Unity Log is UnHooked!");
+        }
+
+        public bool IsUnityLogHooked()
+        {
+            return UnityLogHook.IsUnityLogHooked();
         }
 
         public string ObfuzResolve(string content)

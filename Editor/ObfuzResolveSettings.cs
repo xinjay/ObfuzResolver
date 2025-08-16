@@ -1,12 +1,13 @@
 using System.IO;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace ObfuzResolver.Editor
 {
     [System.Serializable]
     public class ObfuzResolveSettings
     {
-        public bool HookUnityDebug;
+        public bool HookUnityLog;
         public bool UseExternalMappingFile;
         public bool RemoveMethodGeneratedByObfuz;
         public string ExternalMappingFile;
