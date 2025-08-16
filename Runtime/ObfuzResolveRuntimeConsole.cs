@@ -343,7 +343,7 @@ namespace ObfuzResolver.Runtime
                 hookunityLog = hooked;
             }
 
-            if (GUILayout.Button("LoadMapppingFile", toolbarButtonStyle))
+            if (GUILayout.Button("LoadMapppingFile",toolbarButtonStyle))
             {
                 ObfuzResolveManager.Instance.LoadDefaultMappingFile();
             }
@@ -357,7 +357,7 @@ namespace ObfuzResolver.Runtime
             GUILayout.Space(10);
 
             GUILayout.Space(10);
-            if (GUILayout.Button("-", toolbarButtonStyle, GUILayout.Width(50), GUILayout.Height(50)))
+            if (GUILayout.Button("-", toolbarButtonStyle,GUILayout.Width(30)))
             {
                 SetConsoleState(false);
             }
