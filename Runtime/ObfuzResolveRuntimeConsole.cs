@@ -24,8 +24,6 @@ namespace ObfuzResolver.Runtime
             }
         }
 
-
-        // UI控制变量
         private bool showConsole = true;
         private Vector2 scrollPosition;
         private Vector2 detailsScrollPosition;
@@ -37,28 +35,19 @@ namespace ObfuzResolver.Runtime
         private bool hookunityLog = false;
         private string searchText = "";
         private Rect windowRect = new Rect(20, 20, 1600, 1000);
-
-        // 日志类型颜色定义
         private static readonly Color errorColor = new(1f, 0.3f, 0.3f);
         private static readonly Color warningColor = new(1f, 0.8f, 0.4f);
         private static readonly Color messageColor = new(0.8f, 0.8f, 0.8f);
         private static readonly Color selectedColor = new(0.3f, 0.5f, 0.8f);
-
-        // 静态日志存储
         private List<LogEntry> logs = new();
         private Dictionary<string, LogEntry> collapsedLogs = new();
-
-        // 布局设置
         private const float ICON_SIZE = 20f;
         private const float ICON_PADDING = 5f;
         private const float COUNT_WIDTH = 40f;
         private const float TEXT_PADDING = 5f;
-        private const float ITEM_HEIGHT = 40f; // 两行文本的高度
-
-        // 富文本标签正则表达式
+        private const float ITEM_HEIGHT = 40f;
         private static readonly Regex richTextRegex = new(@"<[^>]*>", RegexOptions.Compiled);
 
-        // 样式定义
         private GUIStyle toolbarStyle;
         private GUIStyle toolbarButtonStyle;
         private GUIStyle logStyle;
@@ -75,7 +64,7 @@ namespace ObfuzResolver.Runtime
         private GUIContent messageIconContent;
         private GUIContent warningIconContent;
         private GUIContent errorIconContent;
-        private int maxLogCount = 500; // 最大日志条目数
+        private int maxLogCount = 500;
 
         private int messageCount;
         private int warningCount;
@@ -130,7 +119,6 @@ namespace ObfuzResolver.Runtime
 
         private void CreateIcons()
         {
-            // 创建简单的图标纹理
             errorIcon = CreateColoredTexture(errorColor);
             warningIcon = CreateColoredTexture(warningColor);
             infoIcon = CreateColoredTexture(messageColor);
@@ -145,7 +133,7 @@ namespace ObfuzResolver.Runtime
         {
             var tex = new Texture2D(16, 16);
             var pixels = new Color[16 * 16];
-            for (int i = 0; i < pixels.Length; i++)
+            for (var i = 0; i < pixels.Length; i++)
             {
                 pixels[i] = color;
             }
@@ -158,13 +146,12 @@ namespace ObfuzResolver.Runtime
 
         private void HandleLog(string logString, string stackTrace, LogType type)
         {
-            // 如果达到最大日志数量，移除最旧的日志
             if (logs.Count >= maxLogCount)
             {
                 RemoveOldestLog();
             }
 
-            logString = logString.Replace("\r\n", "");
+            logString = logString.Trim().Replace("\r\n", "\n");
             var firstStackTrace = stackTrace.Replace("\r\n", "\n").Split("\n")[0];
             var entry = new LogEntry
             {
@@ -214,7 +201,6 @@ namespace ObfuzResolver.Runtime
             }
 
             SetIconNum();
-            // 自动滚动到底部
             scrollPosition.y = Mathf.Infinity;
         }
 
@@ -286,14 +272,12 @@ namespace ObfuzResolver.Runtime
 
         private void DrawOpenBtn(int windowID)
         {
-            float elementWidth = 30;
-            float elementHeight = 30;
-            // 计算居中坐标
-            float centerX = (windowRect.width - elementWidth) * 0.5f;
-            float centerY = (windowRect.height - elementHeight) * 0.5f;
+            var elementWidth = 30;
+            var elementHeight = 30;
+            var centerX = (windowRect.width - elementWidth) * 0.5f;
+            var centerY = (windowRect.height - elementHeight) * 0.5f;
             var last = GUI.color;
             GUI.color = Color.red;
-            // 创建居中按钮
             if (GUI.Button(new Rect(centerX, centerY, elementWidth, elementHeight), "+"))
             {
                 windowRect.width = 1600;
@@ -312,7 +296,6 @@ namespace ObfuzResolver.Runtime
             DrawLogList();
             DrawDetailsPanel();
             GUILayout.EndVertical();
-            // // 允许拖动窗口
             GUI.DragWindow(new Rect(0, 0, 10000, 140));
         }
 
@@ -343,7 +326,7 @@ namespace ObfuzResolver.Runtime
                 hookunityLog = hooked;
             }
 
-            if (GUILayout.Button("LoadMapppingFile",toolbarButtonStyle))
+            if (GUILayout.Button("LoadMapppingFile", toolbarButtonStyle))
             {
                 ObfuzResolveManager.Instance.LoadDefaultMappingFile();
             }
@@ -357,7 +340,7 @@ namespace ObfuzResolver.Runtime
             GUILayout.Space(10);
 
             GUILayout.Space(10);
-            if (GUILayout.Button("-", toolbarButtonStyle,GUILayout.Width(30)))
+            if (GUILayout.Button("-", toolbarButtonStyle, GUILayout.Width(30)))
             {
                 SetConsoleState(false);
             }
@@ -367,20 +350,19 @@ namespace ObfuzResolver.Runtime
 
         private void DrawLogList()
         {
-            // 计算可视区域高度
             var detailsHeight = selectedLog != null ? 180f : 0f;
             var visibleHeight = windowRect.height - 100 - detailsHeight;
             scrollPosition =
                 GUILayout.BeginScrollView(scrollPosition, GUILayout.Height(Mathf.Max(visibleHeight, 100f)));
 
-            for (int i = 0; i < logs.Count; i++)
+            for (var i = 0; i < logs.Count; i++)
             {
                 var log = logs[i];
                 if (!ShouldShow(log))
                     continue;
                 if (!string.IsNullOrEmpty(searchText))
                 {
-                    string plainText = StripRichTextTags(log.message);
+                    var plainText = StripRichTextTags(log.message);
                     if (plainText.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) < 0)
                     {
                         continue;
@@ -388,7 +370,7 @@ namespace ObfuzResolver.Runtime
                 }
 
                 var logRect = GUILayoutUtility.GetRect(windowRect.width - 30, ITEM_HEIGHT);
-                bool isSelected = selectedLog == log;
+                var isSelected = selectedLog == log;
                 var bgColor = isSelected ? selectedColor : messageColor * ((i % 2 != 0) ? 0.2f : 0.3f);
                 GUI.backgroundColor = bgColor;
                 GUI.Box(logRect, GUIContent.none);
@@ -419,7 +401,6 @@ namespace ObfuzResolver.Runtime
 
                 GUI.Label(textRect, displayText, logStyle);
 
-                // 绘制日志计数（折叠模式）
                 if (collapse && log.count > 1)
                 {
                     var countRect = new Rect(
@@ -438,7 +419,6 @@ namespace ObfuzResolver.Runtime
                 }
             }
 
-            // 添加空区域确保所有日志项都能正确显示
             if (logs.Count == 0)
             {
                 GUILayout.BeginHorizontal();
@@ -451,7 +431,6 @@ namespace ObfuzResolver.Runtime
             GUILayout.EndScrollView();
         }
 
-        // 移除富文本标签的辅助方法
         private string StripRichTextTags(string text)
         {
             if (string.IsNullOrEmpty(text))
@@ -511,11 +490,9 @@ namespace ObfuzResolver.Runtime
         private void RemoveOldestLog()
         {
             if (logs.Count == 0) return;
-
-            // 找到最旧的日志
-            LogEntry oldestLog = logs[0];
-            int oldestIndex = 0;
-            for (int i = 1; i < logs.Count; i++)
+            var oldestLog = logs[0];
+            var oldestIndex = 0;
+            for (var i = 1; i < logs.Count; i++)
             {
                 if (logs[i].timestamp < oldestLog.timestamp)
                 {
@@ -523,20 +500,14 @@ namespace ObfuzResolver.Runtime
                     oldestIndex = i;
                 }
             }
-
-            // 从列表中移除
             logs.RemoveAt(oldestIndex);
-
-            // 如果被移除的日志是当前选中的，清除选择
             if (selectedLog == oldestLog)
             {
                 selectedLog = null;
             }
-
-            // 如果日志是折叠的，从折叠字典中移除
             if (collapse)
             {
-                string key = $"{oldestLog.type}-{oldestLog.message}";
+                var key = $"{oldestLog.type}-{oldestLog.message}";
                 if (collapsedLogs.ContainsKey(key) && collapsedLogs[key] == oldestLog)
                 {
                     collapsedLogs.Remove(key);

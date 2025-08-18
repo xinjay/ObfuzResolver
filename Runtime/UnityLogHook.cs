@@ -7,19 +7,14 @@ namespace ObfuzResolver.Runtime
 {
     public class UnityLogHook
     {
-        private delegate void LogCallbackHandler(string logString, string stackTrace, LogType type,
-            bool invokedOnMainThread);
-
+        private delegate void LogCallbackHandler(string logString, string stackTrace, LogType type, bool invokedOnMainThread);
         private static MethodHook _hook;
-        //private static Application.LogCallback s_LogCallbackHandlerThreaded;
-        //private static Application.LogCallback s_LogCallbackHandler;
-
         private static FieldInfo filed_s_LogCallbackHandler;
         private static FieldInfo filed_s_LogCallbackHandlerThreaded;
 
         public static void HookUnityLog()
         {
-           // if (_hook == null)
+            // if (_hook == null)
             {
                 var type = typeof(Application);
                 filed_s_LogCallbackHandler =
@@ -50,13 +45,12 @@ namespace ObfuzResolver.Runtime
             stackTrace = ObfuzResolveManager.Instance.ObfuzResolve(stackTrace);
             if (invokedOnMainThread)
             {
-                var logCallbackHandler = filed_s_LogCallbackHandler.GetValue(null) as Application.LogCallback;
-                if (logCallbackHandler != null)
+                if (filed_s_LogCallbackHandler.GetValue(null) is Application.LogCallback logCallbackHandler)
                     logCallbackHandler(logString, stackTrace, type);
             }
 
-            var callbackHandlerThreaded = filed_s_LogCallbackHandlerThreaded.GetValue(null) as Application.LogCallback;
-            if (callbackHandlerThreaded == null)
+            if (filed_s_LogCallbackHandlerThreaded.GetValue(null) is not Application.LogCallback
+                callbackHandlerThreaded)
                 return;
             callbackHandlerThreaded(logString, stackTrace, type);
         }

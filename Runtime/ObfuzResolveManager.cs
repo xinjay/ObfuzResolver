@@ -88,7 +88,6 @@ namespace ObfuzResolver.Runtime
                     stringBuilder.AppendLine(deobfuz);
                 }
             }
-
             return stringBuilder.ToString();
         }
 

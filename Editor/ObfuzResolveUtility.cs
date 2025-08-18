@@ -181,7 +181,6 @@ namespace ObfuzResolver.Editor
                 ObfuzResolveManager.Instance.HookUnityLog();
             else
                 ObfuzResolveManager.Instance.UnHookUnityLog();
-            //Debug.Log($"Unity Log Hooked:{ObfuzResolveSettings.Instance.HookUnityLog}");
         }
     }
 }
