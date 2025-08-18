@@ -17,12 +17,12 @@ namespace ObfuzResolver.Editor
         private bool showMessages = true;
         private bool collapse = false;
         private string searchText = "";
-        
+
         private static readonly Color errorColor = new(1f, 0.3f, 0.3f);
         private static readonly Color warningColor = new(1f, 0.8f, 0.4f);
         private static readonly Color messageColor = new(0.8f, 0.8f, 0.8f);
         private static readonly Color selectedColor = new(0.3f, 0.5f, 0.8f);
-        
+
         private List<LogEntry> logs = new();
         private Dictionary<string, LogEntry> collapsedLogs = new();
 
@@ -30,18 +30,18 @@ namespace ObfuzResolver.Editor
         private const float ICON_PADDING = 5f;
         private const float COUNT_WIDTH = 40f;
         private const float TEXT_PADDING = 5f;
-        private const float ITEM_HEIGHT = 40f; 
+        private const float ITEM_HEIGHT = 40f;
 
         private GUIContent settingsIcon;
         private GUIContent messageIcon;
         private GUIContent warningIcon;
         private GUIContent errorIcon;
-        private int maxLogCount = 500; 
+        private int maxLogCount = 500;
 
         private int messageCount;
         private int warningCount;
         private int errorCount;
-        
+
         private static readonly Regex richTextRegex = new(@"<[^>]*>", RegexOptions.Compiled);
 
         [MenuItem("ObfuzResolver/Resolver Console")]
@@ -166,18 +166,22 @@ namespace ObfuzResolver.Editor
             {
                 Clear();
             }
+
             GUILayout.Space(10);
             collapse = GUILayout.Toggle(collapse, "Collapse", EditorStyles.toolbarButton);
             EditorGUI.BeginChangeCheck();
             var settings = ObfuzResolveSettings.Instance;
+            var external = settings.UseExternalMappingFile;
             EditorGUI.BeginChangeCheck();
             settings.HookUnityLog =
-                GUILayout.Toggle(settings.HookUnityLog, "HookUnityLog", EditorStyles.toolbarButton);
+                GUILayout.Toggle(settings.HookUnityLog, $"HookUnityLog{(external ? "[E]" : "")}",
+                    EditorStyles.toolbarButton);
             if (EditorGUI.EndChangeCheck())
             {
                 ObfuzResolveUtility.HookUnityDebugIfNeeded();
                 ObfuzResolveSettings.Save();
             }
+
             GUILayout.FlexibleSpace();
             var searchStyle = GUI.skin.FindStyle("ToolbarSeachTextField") ?? EditorStyles.textField;
             searchStyle.alignment = TextAnchor.MiddleCenter;
@@ -191,6 +195,7 @@ namespace ObfuzResolver.Editor
             {
                 ObfuzResolveUtility.ShowWindow();
             }
+
             GUILayout.EndHorizontal();
         }
 
@@ -202,7 +207,7 @@ namespace ObfuzResolver.Editor
 
             scrollPosition = GUILayout.BeginScrollView(scrollPosition,
                 GUILayout.Height(Mathf.Max(visibleHeight, 100f)));
-            
+
             var logStyle = new GUIStyle(EditorStyles.label)
             {
                 padding = new RectOffset(0, 0, 0, 0),
@@ -210,9 +215,9 @@ namespace ObfuzResolver.Editor
                 wordWrap = true,
                 clipping = TextClipping.Clip,
                 alignment = TextAnchor.UpperLeft,
-                richText = true 
+                richText = true
             };
-            
+
             var countStyle = new GUIStyle(EditorStyles.miniLabel)
             {
                 alignment = TextAnchor.MiddleRight,
@@ -224,7 +229,7 @@ namespace ObfuzResolver.Editor
             {
                 var log = logs[i];
                 if (!ShouldShow(log)) continue;
-                
+
                 if (!string.IsNullOrEmpty(searchText))
                 {
                     var plainText = StripRichTextTags(log.message);
@@ -233,7 +238,7 @@ namespace ObfuzResolver.Editor
                         continue;
                     }
                 }
-                
+
                 var logRect = GUILayoutUtility.GetRect(position.width, ITEM_HEIGHT);
                 var isSelected = selectedLog == log;
                 var bgColor = isSelected ? selectedColor : messageColor * ((i % 2 != 0) ? 0.2f : 0.3f);
@@ -272,7 +277,7 @@ namespace ObfuzResolver.Editor
                     );
                     GUI.Label(countRect, $"{log.count}x", countStyle);
                 }
-                
+
                 if (i < logs.Count - 1)
                 {
                     var lineRect = new Rect(
@@ -283,13 +288,14 @@ namespace ObfuzResolver.Editor
                     );
                     EditorGUI.DrawRect(lineRect, new Color(0.2f, 0.2f, 0.2f, 0.2f));
                 }
-                
+
                 if (GUI.Button(logRect, "", GUIStyle.none))
                 {
                     selectedLog = log;
                     detailsScrollPosition = Vector2.zero;
                 }
             }
+
             if (logs.Count == 0)
             {
                 GUILayout.Label("No logs available", EditorStyles.centeredGreyMiniLabel, GUILayout.Height(50));
@@ -297,7 +303,7 @@ namespace ObfuzResolver.Editor
 
             GUILayout.EndScrollView();
         }
-        
+
         private string StripRichTextTags(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
@@ -348,7 +354,7 @@ namespace ObfuzResolver.Editor
                 GUILayout.Height(150));
             var richTextStyle = new GUIStyle(EditorStyles.textArea)
             {
-                richText = true, 
+                richText = true,
                 wordWrap = true,
                 alignment = TextAnchor.UpperLeft
             };
@@ -384,11 +390,13 @@ namespace ObfuzResolver.Editor
                     oldestIndex = i;
                 }
             }
+
             logs.RemoveAt(oldestIndex);
             if (selectedLog == oldestLog)
             {
                 selectedLog = null;
             }
+
             if (collapse)
             {
                 var key = $"{oldestLog.type}-{oldestLog.message}";
