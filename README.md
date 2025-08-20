@@ -1,7 +1,8 @@
 # ObfuzResolver
 
 [![license](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/xinjay/ObfuzResolver/blob/master/LICENSE)
-[CSDN](https://blog.csdn.net/xinjay1992/article/details/150548652) |[Github](https://github.com/xinjay/ObfuzResolver) | [Gitee](https://gitee.com/xinjay/obfuz-resolver)
+
+[CSDN](https://blog.csdn.net/xinjay1992/article/details/150548652) | [Github](https://github.com/xinjay/ObfuzResolver) | [Gitee](https://gitee.com/xinjay/obfuz-resolver)
 
 ObfuzResolver是基于[obfuz-tools](https://github.com/focus-creative-games/obfuz-tools)针对[Obfuz](https://github.com/focus-creative-games/obfuz)的一项辅助工具，方便开发者在unity编辑器中或者运行时快捷将使用Obfuz混淆加固后的日志信息还原为原始信息，以辅助开发者快速定位Bug。
 
