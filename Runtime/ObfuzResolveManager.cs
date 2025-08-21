@@ -23,7 +23,7 @@ namespace ObfuzResolver.Runtime
             }
         }
 
-        public static void LoadObfuzResolver()
+        public static void LoadObfuzResolver(bool enableConsole = true)
         {
             var mappingFile = Path.Combine(Application.persistentDataPath, "mapping.xml");
             Debug.Log($"mappingFile:{mappingFile}");
@@ -31,7 +31,10 @@ namespace ObfuzResolver.Runtime
             {
                 Instance.LoadMapFile(mappingFile);
                 Instance.HookUnityLog();
-                ObfuzResolveRuntimeConsole.Instance.SetConsoleState(true);
+                if (enableConsole)
+                {
+                    ObfuzResolveRuntimeConsole.Instance.SetConsoleState(true);
+                }
             }
         }
 
@@ -88,6 +91,7 @@ namespace ObfuzResolver.Runtime
                     stringBuilder.AppendLine(deobfuz);
                 }
             }
+
             return stringBuilder.ToString();
         }
 
