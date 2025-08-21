@@ -30,7 +30,7 @@ ObfuzResolver是基于[obfuz-tools](https://github.com/focus-creative-games/obfu
 
 ObfuzResolver的Unity Package Manager URL安装地址：
 
-- gitee `https://gitee.com/xinjay/ObfuzResolver.git`
+- gitee `https://gitee.com/xinjay/obfuz-resolver.git`
 - github `https://github.com/xinjay/ObfuzResolver.git`
 
 打开Unity Package Manager窗口，点击`Add package from URL...`，填入以上地址之一即可完成安装。
